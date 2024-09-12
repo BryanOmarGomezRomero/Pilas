@@ -1,1 +1,183 @@
-codigo
+#include <iostream>
+#include <string>
+using namespace std;
+
+const int MAX = 100;
+
+class empleado {
+private:
+    int clave;
+    string nombre;
+    string domicilio;
+    float sueldo;
+    string reportaA;
+
+
+    void CambiaDomicilio(string);
+    void CambiaReportaA(string);
+    void ActualizarSueldo(float);
+
+public:
+    empleado(int _clave = 0, string _nombre = "", string _domicilio = "", float _sueldo = 0.0, string _reportaA = "")
+        : clave(_clave), nombre(_nombre), domicilio(_domicilio), sueldo(_sueldo), reportaA(_reportaA) {}
+
+    void imprime() const;
+    friend ostream& operator<<(ostream& os, const empleado& emp) {
+        os << "Clave: " << emp.clave << ", Nombre: " << emp.nombre
+           << ", Domicilio: " << emp.domicilio << ", Sueldo: " << emp.sueldo
+           << ", Reporta a: " << emp.reportaA;
+        return os;
+    }
+
+    bool operator==(const empleado& otro) const { return clave == otro.clave; }
+    bool operator<(const empleado& otro) const { //sobrecarga de <
+        return this->sueldo < otro.sueldo;
+    }
+    bool operator>(const empleado& otro) const {  // Sobrecarga del operador >
+        return this->sueldo > otro.sueldo;
+    }
+    bool operator!=(const empleado& otro) const { // compara que ambos sueldos sean diferentes
+        return this->sueldo != otro.sueldo;
+    }
+
+    friend istream& operator>>(istream& is, empleado& emp) {
+        cout << "Ingrese clave: ";
+        is >> emp.clave;
+        cout << "Ingrese nombre: ";
+        is.ignore();
+        getline(is, emp.nombre);
+        cout << "Ingrese domicilio: ";
+        getline(is, emp.domicilio);
+        cout << "Ingrese sueldo: ";
+        is >> emp.sueldo;
+        cout << "Ingrese jefe a quien reporta: ";
+        is.ignore();
+        getline(is, emp.reportaA);
+        return is;
+    }
+};
+
+class Pila {
+private:
+    empleado datos[MAX];
+    int cima;
+public:
+    Pila() : cima(-1) {}
+    bool push(const empleado& emp);
+    bool pop();
+    empleado top() const;
+    bool llena() const;
+    bool vacia() const;
+    void mostrarPila() const;
+};
+
+bool Pila::push(const empleado& emp) {
+    if (llena()) {
+        cout << "La pila esta llena, no se puede agregar." << endl;
+        return false;
+    }
+    datos[++cima] = emp;
+    return true;
+}
+
+bool Pila::pop() {
+    if (vacia()) {
+        cout << "La pila esta vacia, no se puede desapilar." << endl;
+        return false;
+    }
+    cima--;
+    return true;
+}
+
+empleado Pila::top() const {
+    if (vacia()) {
+        cout << "La pila esta vacia." << endl;
+        return empleado();
+    }
+    return datos[cima];
+}
+
+
+bool Pila::llena() const {
+    return cima == MAX - 1;
+}
+
+bool Pila::vacia() const {
+    return cima == -1;
+}
+
+void Pila::mostrarPila() const {
+    if (vacia()) {
+        cout << "La pila esta vacia." << endl;
+        return;
+    }
+    for (int i = cima; i >= 0; i--) {
+        cout << "Posición " << i << ": " << datos[i] << endl;
+    }
+}
+
+void empleado::imprime() const {
+    cout << "Clave: " << clave << endl;
+    cout << "Nombre: " << nombre << endl;
+    cout << "Domicilio: " << domicilio << endl;
+    cout << "Sueldo: " << sueldo << endl;
+    cout << "Reporta a: " << reportaA << endl;
+}
+
+int main() {
+    Pila pila;
+    empleado emp;
+    int opcion;
+
+    do {
+        cout << "\nMenu" << endl;
+        cout << "1. Push (Apilar)" << endl;
+        cout << "2. Pop (Desapilar)" << endl;
+        cout << "3. Top (Mostrar cima)" << endl;
+        cout << "4. Salir" << endl;
+        cout << "Digite un numero: ";
+        cin >> opcion;
+
+        switch(opcion) {
+            case 1:
+                cin >> emp;
+                pila.push(emp);
+                break;
+            case 2:
+                pila.pop();
+                break;
+            case 3:
+                emp = pila.top();
+                emp.imprime();
+                break;
+            case 4:
+                cout << "Hasta luego" << endl;
+                break;
+            default:
+                cout << "Opcion no valida." << endl;
+        }
+    } while(opcion != 4);
+
+    return 0;
+}
+
+void empleado::CambiaDomicilio(string nuevoDomicilio) {
+    cout << "Dame el nuevo domicilio: ";
+    cin >> nuevoDomicilio;
+    domicilio = nuevoDomicilio;
+    cout << "Domicilio cambiado." << endl;
+}
+
+void empleado::CambiaReportaA(string nuevoReportaA) {
+    cout << "Dame el nuevo jefe a quien reporta: ";
+    cin >> nuevoReportaA;
+    reportaA = nuevoReportaA;
+    cout << "Jefe cambiado." << endl;
+}
+
+void empleado::ActualizarSueldo(float sueldo2) {
+    cout << "Dame el nuevo sueldo: ";
+    cin >> sueldo2;
+    sueldo = sueldo2;
+    cout << "Sueldo actualizado." << endl;
+}
